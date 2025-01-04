@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"compiler/tokenizer"
 	"os"
 )
 
@@ -14,8 +14,9 @@ func check(e error) {
 func main() {
 	input, err := os.ReadFile("input.xd")
 	check(err)
-	fmt.Println(string(input))
 	output := []byte("testing\ntesting2")
 	err = os.WriteFile("output.asm", output, 0644)
 	check(err)
+	tokenHandler := tokenizer.Tokenizer{}
+	tokenHandler.Tokenize(string(input))
 }
