@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compiler/parser"
 	"compiler/tokenizer"
 	"os"
 )
@@ -14,9 +15,11 @@ func check(e error) {
 func main() {
 	input, err := os.ReadFile("input.xd")
 	check(err)
-	output := []byte("testing\ntesting2")
-	err = os.WriteFile("output.asm", output, 0644)
-	check(err)
 	tokenHandler := tokenizer.Tokenizer{}
-	tokenHandler.Tokenize(string(input))
+	list := tokenHandler.Tokenize(string(input))
+	parsing := parser.Parser{}
+	output := "global _start\n_start:\n"
+	output += parsing.Parse(list)
+	err = os.WriteFile("output.asm", []byte(output), 0644)
+	check(err)
 }
