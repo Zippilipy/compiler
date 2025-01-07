@@ -4,6 +4,8 @@ import (
 	"compiler/tokenizer"
 	"errors"
 	"fmt"
+	"go/token"
+	"go/types"
 	"strconv"
 )
 
@@ -24,8 +26,9 @@ func (parser Parser) Parse(list tokenizer.List) string {
 			}
 			list.Consume()
 			checkEmpty(list, "number", line)
-			number, line := list.Peek(0)
-			if !isInteger(number) {
+			expression, line := list.Peek(0)
+			number, err := Evaluate(expression)
+			if err != nil {
 				panic(errors.New(fmt.Sprintf("expected number, got %s at line %s", number, strconv.Itoa(line))))
 			}
 			list.Consume()
@@ -55,4 +58,13 @@ func checkEmpty(list tokenizer.List, expected string, line int) {
 	if list.IsEmpty() {
 		panic(errors.New(fmt.Sprintf("expected %s at line %s", expected, strconv.Itoa(line))))
 	}
+}
+
+func Evaluate(expression string) (string, error) {
+	fileSet := token.NewFileSet()
+	tr, err := types.Eval(fileSet, nil, token.NoPos, expression)
+	if err != nil {
+		return "", err
+	}
+	return tr.Value.String(), nil
 }
